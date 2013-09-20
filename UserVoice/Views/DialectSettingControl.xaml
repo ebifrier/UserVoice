@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="UserVoice.Views.DialectSettingControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:v="clr-namespace:UserVoice.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="351" d:DesignWidth="335">
+    <StackPanel Orientation="Vertical" Name="layoutBase">
+        <CheckBox Margin="5,5,0,0"
+                  Content="方言変換機能を使う"
+                  IsChecked="{Binding IsUseDialect}"
+                  Name="useDialectConverterCheckBox" />
+
+        <GroupBox Header="方言変換設定" Margin="10,5,0,0"
+                  IsEnabled="{Binding Path=IsChecked,
+                                      ElementName=useDialectConverterCheckBox}">
+            <StackPanel Orientation="Vertical">
+                <RadioButton Content="自前で変換する"
+                             Name="convertSelfCheckBox"
+                             IsChecked="{Binding IsDialectConvertSelf}" />
+                <GroupBox Header="詳細" Margin="10,0,0,0"
+                          IsEnabled="{Binding Path=IsChecked,
+                                              ElementName=convertSelfCheckBox}">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Stretch">
+                            <Label Content="デフォルト：　" />
+                            <ComboBox VerticalContentAlignment="Center"
+                                      Width="180"
+                                      Name="convertSelfDefaultComboBox"
+                                      ItemsSource="{Binding ConvertSelfDialectList}"
+                                      DisplayMemberPath="DisplayName"
+                                      SelectedValuePath="DialectType"
+                                      SelectedValue="{Binding DialectConvertSelfDefaultType}"/>
+                        </StackPanel>
+
+                        <Label Content="使える方言" />
+                        <v:TextBlockEx Margin="20,0,0,0"
+                                       Text="大阪" />
+                    </StackPanel>
+                </GroupBox>
+
+                <RadioButton Content="Webサイト(もんじろう)で変換する"
+                             Name="convertWebCheckBox"
+                             IsChecked="{Binding IsDialectConvertWeb}" />
+                <GroupBox Header="詳細" Margin="10,0,0,0"
+                          IsEnabled="{Binding Path=IsChecked,
+                                              ElementName=convertWebCheckBox}">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Stretch">
+                            <Label Content="デフォルト：　" />
+                            <ComboBox VerticalContentAlignment="Center"
+                                      Width="180"
+                                      Name="convertWebDefaultComboBox"
+                                      ItemsSource="{Binding ConvertWebDialectList}"
+                                      DisplayMemberPath="DisplayName"
+                                      SelectedValuePath="DialectType"
+                                      SelectedValue="{Binding DialectConvertWebDefaultType}"/>
+                        </StackPanel>
+                        <Label Content="使える方言" />
+                        <v:TextBlockEx Margin="20,0,0,0"
+                                       TextWrapping="Wrap"
+                                       Text="大阪, 武士, 龍馬, オネェ, マイケル, ジョジョ, のりぴー, 業界, 沖縄, 博多, 宮崎, 京都, 津軽, 練馬, 氏語, 2ちゃん, ギャル, ナベアツ, ヤンキー, ルー, よしお, ランダム" />
+                        <Label Content="注意点" />
+                        <v:TextBlockEx Margin="20,0,0,0"
+                                       TextWrapping="Wrap"
+                                       Text="変換が遅いときとかは使わないde(*^-^)" />
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</UserControl>
