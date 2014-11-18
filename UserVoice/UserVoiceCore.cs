@@ -40,7 +40,8 @@ namespace UserVoice
         /// </summary>
         private static string[] voiceTags = 
         {
-            "", "ai)", "shou)", "yukari)", "tomoe)", /*"zunko)"*/
+            "", "ai)", "shou)", "yukari)", "tomoe)",
+            "zunko)", "akane)", "aoi)",
         };
 
         /// <summary>
