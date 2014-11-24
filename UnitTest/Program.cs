@@ -38,5 +38,15 @@ namespace UnitTest
                 UserVoice.Dialect.DialectType.Noripi,
                 TimeSpan.FromSeconds(10));*/
         }
+
+        /// <summary>
+        /// ショウタを高速で読み上げさせると２回読み上げるというバグを発生させます。
+        /// </summary>
+        static void RepeatTest()
+        {
+            for (int i = 0; i < 10; ++i)
+            {
+            }
+        }
     }
 }

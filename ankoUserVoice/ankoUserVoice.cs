@@ -21,10 +21,29 @@ namespace UserVoice
     [CLSCompliant(false)]
     public sealed class ankoUserVoice : DispatcherObject, IPlugin
     {
-        private UserVoiceCore core = new UserVoiceCore();
+        private readonly object syncObject = new object();
+        private readonly Thread readOutThread;
+        private readonly Queue<chat> readOutTaskQueue = new Queue<chat>();
+
+        private readonly UserVoiceCore core = new UserVoiceCore();
         private IPluginHost vHost;
         private DateTime startTime;
         private DateTime lastCommentTime = DateTime.Now;
+        
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public ankoUserVoice()
+        {
+            this.readOutThread = new Thread(ReadOutThreadMain)
+            {
+                IsBackground = true,
+                Name = "ReadOut",
+                Priority = ThreadPriority.BelowNormal,
+            };
+
+            this.readOutThread.Start();
+        }
 
         /// <summary>
         /// プラグインに与えられるホストを取得します。
@@ -139,9 +158,50 @@ namespace UserVoice
         }
 
         /// <summary>
+        /// 読み上げ処理が遅れるとコメントを２回読むなどの不具合がでるため、
+        /// 専用スレッドを用意して処理速度を上げます。
+        /// </summary>
+        private void ReadOutThreadMain()
+        {
+            while (true)
+            {
+                try
+                {
+                    chat task = null;
+                    lock (syncObject)
+                    {
+                        // 処理するタスクを一つ取得します。
+                        if (!this.readOutTaskQueue.Any())
+                        {
+                            // ウェイト時間は最大でも300msとします。
+                            Monitor.Wait(this.syncObject, 300);
+                            continue;
+                        }
+
+                        task = this.readOutTaskQueue.Dequeue();
+                    }
+
+                    HandleChat(task);
+                }
+                catch (ThreadAbortException)
+                {
+                    // スレッド終了時に呼ばれます。
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    // 例外は無視します。
+                    Util.TraceLog(
+                        "{0}: ThreadMainで例外が発生しました。",
+                        ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
         /// コメントを処理します。
         /// </summary>
-        private void HandleComment(chat chat)
+        private void HandleChat(chat chat)
         {
             Util.TraceLog("コメント: {0}({1})",
                 chat.Message, chat.No);
@@ -189,19 +249,24 @@ namespace UserVoice
             this.lastCommentTime = DateTime.Now;
         }
 
+        /// <summary>
+        /// コメント受信時に呼ばれます。
+        /// </summary>
         void host_ReceivedChat(object sender, ReceiveChatEventArgs e)
         {
             Util.TraceLog("コメントを受信しました。");
-            
-            if (this.Dispatcher.CheckAccess())
+
+            if (e.Chat == null)
             {
-                HandleComment(e.Chat);
+                return;
             }
-            else
+
+            lock(this.syncObject)
             {
-                Dispatcher.BeginInvoke(
-                    (Action<chat>)HandleComment,
-                    e.Chat);
+                // 別スレッドで処理するためのタスクを追加します。
+                this.readOutTaskQueue.Enqueue(e.Chat);
+
+                Monitor.PulseAll(this.syncObject);
             }
         }
 
