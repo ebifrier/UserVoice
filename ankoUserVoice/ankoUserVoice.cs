@@ -181,7 +181,10 @@ namespace UserVoice
                         task = this.readOutTaskQueue.Dequeue();
                     }
 
-                    HandleChat(task);
+                    if (task != null)
+                    {
+                        HandleChat(task);
+                    }
                 }
                 catch (ThreadAbortException)
                 {
