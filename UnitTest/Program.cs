@@ -32,11 +32,11 @@ namespace UnitTest
                 "",
                 UserVoiceCore.GetVoicePrefix("声"));
 
-            /*var converter = new UserVoice.Dialect.DialectConverterWeb();
+            var converter = new UserVoice.Dialect.DialectConverterWeb();
             converter.BeginConvertText(
                 "教育(野武士=www) 武士) 音量(200) 教育(野武士=www) おはようございます ノリピー) おはようございます",
                 UserVoice.Dialect.DialectType.Noripi,
-                TimeSpan.FromSeconds(10));*/
+                TimeSpan.FromSeconds(10));
         }
 
         /// <summary>

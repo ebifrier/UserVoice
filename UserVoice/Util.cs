@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Globalization;
-using System.Diagnostics;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace UserVoice
 {
@@ -45,6 +46,39 @@ namespace UserVoice
         public static string EliminateTags(string text)
         {
             return htmlTagRegex.Replace(text, "");
+        }
+
+        /// <summary>
+        /// UIスレッドに関連づけられたディスパッチャーを取得します。
+        /// </summary>
+        public static Dispatcher UIDispatcher
+        {
+            get
+            {
+                if (Application.Current == null)
+                {
+                    return null;
+                }
+
+                return Application.Current.Dispatcher;
+            }
+        }
+
+        /// <summary>
+        /// 与えられた手続きをUIスレッド上で実行します。
+        /// </summary>
+        public static void UIProcess(Action func)
+        {
+            var dispatcher = UIDispatcher;
+
+            if (dispatcher == null || dispatcher.CheckAccess())
+            {
+                func();
+            }
+            else
+            {
+                dispatcher.BeginInvoke(func);
+            }
         }
 
         /// <summary>

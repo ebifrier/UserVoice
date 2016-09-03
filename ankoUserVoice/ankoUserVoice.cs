@@ -183,7 +183,7 @@ namespace UserVoice
 
                     if (task != null)
                     {
-                        HandleChat(task);
+                        Util.UIProcess(() => HandleChat(task));
                     }
                 }
                 catch (ThreadAbortException)
